@@ -1,7 +1,5 @@
 least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
 {
-  # print( is.data.frame( obs) )
-
   stations <- unique( sort( c( as.vector( obs$source ), as.vector( obs$target ) ) ) )
 
   u <- 3 * length( stations )
@@ -15,7 +13,6 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
   cov_obs <- matrix( rep( 0.0, n * n ), nrow = n, ncol = n )
 
   j <- 1 : 3
-  # s <- 0.0 # debug
 
   for( i in 1 : nrow( obs ) ) {
 
@@ -28,14 +25,12 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
     cov_obs[j[3],j[3]] <- ( obs[i,"sigmaDZ"] ^ 2 )
 
     k <- 3 * which( stations == obs[i,"source"] )
-    # s <- s + length( k ) # debug
 
     a[j[1],k-2] <- -1.0
     a[j[2],k-1] <- -1.0
     a[j[3],k  ] <- -1.0
 
     k <- 3 * which( stations == obs[i,"target"] )
-    # s <- s + length( k ) # debug
 
     a[j[1],k-2] <- 1.0
     a[j[2],k-1] <- 1.0
@@ -55,7 +50,6 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
     cov_obs[j[3],j[3]] <- ( ( alpha * ref[i,"sigmaZ"] ) ^ 2 )
 
     k <- 3 * which( stations == ref[i,"station"] )
-    # s <- s + length( k ) # debug
 
     a[j[1],k-2] <- 1.0
     a[j[2],k-1] <- 1.0
@@ -63,8 +57,6 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
 
     j <- j + 3
   }
-
-  # print( s == ( 2 * nrow( obs ) + nrow( ref ) ) ) # debug
 
   w <- sigma_priori * solve( cov_obs )
 
@@ -100,15 +92,9 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
   obs <- data.frame( targets, zeros, zeros, zeros, zeros, zeros, zeros )
   colnames( obs ) <- c( "station", "X", "Y", "Z", "sigmaX", "sigmaY", "sigmaZ" )
 
-  # d1 <- NULL
-  # d2 <- NULL
-
   for( i in 1 : n ) {
 
     k <- 3 * which( stations == obs[i,"station"] ) - c( 2, 1, 0 )
-
-    # d1 <- c( d1, k )
-    # d2 <- c( d2, obs[i,"station"] )
 
     obs[i,"X"] <- x[k[1],1]
     obs[i,"Y"] <- x[k[2],1]
@@ -128,9 +114,6 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
 
     k <- 3 * which( stations == marker ) - c( 2, 1, 0 )
 
-    # d1 <- c( d1, k )
-    # d2 <- c( d2, marker )
-
     obs[n,"X"] <- x[k[1],1]
     obs[n,"Y"] <- x[k[2],1]
     obs[n,"Z"] <- x[k[3],1]
@@ -140,16 +123,12 @@ least_squares_network <- function( obs, ref, alpha = 1.0, sigma_priori = 1.0 )
     obs[n,"sigmaZ"] <- sqrt( cov_x[k[3],k[3]] )
   }
 
-  # print( sum( sort( d1 ) == seq.int( 1, nrow( x ) ) ) == nrow( x ) )
-  # print( sum( sort( d2 ) == stations ) == length( stations ) )
-
   result <- list()
+
   result$stations <- obs
   result$sigma_post <- sigma_post
   result$critical_chisq <- critical_chisq
   result$delta <- delta
-  # result$v <- v
-  # result$w <- w
 
   return ( result )
 }
